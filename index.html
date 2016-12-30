@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="css/vendor/bootstrap.min.css">
+        <link rel="stylesheet" href="css/vendor/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script>
+            window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')
+        </script>
+    </head>
+    <body>
+        <div class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+              <div class="navbar-header">
+                <a href="/rappiFront" class="navbar-brand">Rappi Web UI</a>
+              </div>
+              <div class="navbar-collapse collapse" id="navbar-main">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">Mercedes Rodríguez</a></li>
+                    <li>
+                       <a href="carrito.html" id="carrito-compra">
+                           <i class="fa fa-shopping-cart" title="Agregar al Carrito"></i>
+                           <span id="numero-items" class="badge"></span>
+                        </a> 
+                    </li>
+                </ul>
+              </div>
+            </div>
+        </div>
+        
+        <div class="container main-container">
+            <form id="filtros">
+                <div id="filtros-content" class="col-xs-12 col-sm-3 well bs-component margin-top-simple">
+                <div id="filtro-categoria" class="row">
+                    <div class="col-xs-12">
+                        <strong>Categorías</strong>
+                        <select id="filtro-categoria-select" class="form-control margin-top-simple">
+                            <option value="0">Seleccione</option>
+                        </select>
+                        <hr />
+                    </div>
+                </div>
+                
+                <div id="filtro-estado" class="row">
+                    <div class="col-xs-12">
+                        <strong>Estado</strong>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="estado" id="estadoTodos" value="0" checked="">
+                                Todos
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="estado" id="estadoDisponible" value="1">
+                                Disponible
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="estado" id="estadoNoDisponible" value="2">
+                                No Disponible
+                            </label>
+                        </div>
+                        <hr />
+                    </div>
+                </div>
+                
+                <div id="filtro-precio" class="row">
+                    <div class="col-xs-12">
+                        <strong>Precio</strong>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="precio" id="precioTodos" value="0" checked="">
+                                Todos
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="precio" id="precioMayor" value="1">
+                                Mayor a 30.000
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="precio" id="precioMenor" value="2">
+                                Menor a 10.000
+                            </label>
+                        </div>
+                        <hr />
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-xs-12 text-center">
+                        <button type="submit" id="filtrar-btn" class="btn btn-primary">Filtrar</button>
+                    </div>
+                </div>
+            </div>
+                
+            </form>
+
+            <div class="col-xs-12 col-sm-9 margin-top-simple">
+                <div class="row">
+                    <div class="col-xs-12 col-md-4">
+                        <select id="ordenamiento" class="form-control">
+                            <option value="1">Nombre</option>
+                            <option value="2">Menor Precio</option>
+                            <option value="3">Mayor Precio</option>
+                        </select>
+                    </div>
+                    <div class="col-xs-12 col-md-4 pull-right">
+                        <input id="buscador-clue" type="text" class="form-control" placeholder="Buscador">
+                    </div>
+                </div>
+                <div id="productos-content" class="row">
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        
+        <!-- Templates -->
+        <script src="js/vendor/handlebars.js"></script>
+        <script src="js/main.js"></script>
+        
+        <script id="tpl-producto" type="text/x-handlebars-template">
+            <div class="producto col-xs-12 col-md-6">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h4>{{nombre}}</h4>
+                    </div>
+                </div>
+                
+                <div class="row margin-top-mitad">
+                    <div class="col-xs-6">
+                        <img src="{{img}}">
+                    </div>
+                    <div class="col-xs-6">
+                         <span class="{{disponibleClassText}}">{{disponible}}</span><br>
+                         <strong>Precio: </strong>{{precio}}<br>
+                         <strong>Best Seller: </strong>{{bestSeller}}<br>
+                         <div class="row margin-top-simple {{disponibleClassBtn}}">
+                            <div class="col-xs-6">
+                                <a href="#" class="btn btn-success btn-xs agregar-carrito" data-producto="{{id}}">Agregar al Carrito</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                 <div class="row margin-top-mitad">
+                    <div class="col-xs-6">
+                         <strong>Categorias: </strong>{{categorias}}
+                    </div>
+                </div>	
+               
+                <div class="row margin-top-mitad truncate">
+                    <div class="col-xs-12">
+                        <p>{{descripcion}}</p>
+                    </div>
+                </div>
+            </div>
+        </script>
+        <!-- Fin Templates -->
+        
+        <script type="text/javascript">
+                                                    
+            var categoriasProductos = [];                                      
+            var productosBusqueda = [];
+            
+            // -------------------------------------------------------
+            function ordenarPorNombre(){
+                productosBusqueda.sort(sortByName);
+            }
+            
+            // -------------------------------------------------------
+            function ordenarPorMenorPrecio(){
+                productosBusqueda.sort(sortByLessPrice);
+            }
+            
+            // -------------------------------------------------------
+            function ordenarPorMayorPrecio(){
+                productosBusqueda.sort(sortByMaxPrice);
+            }
+            
+            // -------------------------------------------------------
+            function sortByName(a, b){
+                if(a && b){
+                    var aName = a.name.toLowerCase();
+
+                    var bName = b.name.toLowerCase(); 
+                    return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+                }
+            }
+            
+            // -------------------------------------------------------
+            function sortByLessPrice(a, b){
+                if(a && b){
+                    var aPrice = transformarPrecios(a.price);
+
+                    var bPrice = transformarPrecios(b.price); 
+                    return ((aPrice < bPrice) ? -1 : ((aPrice > bPrice) ? 1 : 0));
+                }
+            }
+            
+            // -------------------------------------------------------
+            function sortByMaxPrice(a, b){
+                if(a && b){
+                    var aPrice = transformarPrecios(a.price);
+
+                    var bPrice = transformarPrecios(b.price); 
+                    return ((aPrice > bPrice) ? -1 : ((aPrice < bPrice) ? 1 : 0));
+                }
+            }
+
+            // -------------------------------------------------------
+            function buscador(clue){
+                var productos = getProductos();
+                
+                if(clue!=""){
+                    var search = new RegExp(clue , "i");
+                    productos = $.grep(productos, function(p) {
+                         if(p){
+                            return search.test(p.name);
+                        }
+                    });
+                } 
+                $("#filtros").trigger('reset');
+                
+                productosBusqueda = productos;
+                pintarProductos();
+            }
+            
+            // -------------------------------------------------------
+            function filtrarCategorias(productos, categoria){
+                if(categoria!=0){
+                    productos = $.grep(productos, function(p) {
+                        if(p){
+                            var categorias = p.categories;
+                            return (jQuery.inArray(categoria, categorias) !== -1);
+                        }
+                    });
+                }
+                
+                return productos;
+            }
+            
+            // -------------------------------------------------------
+            function filtrarPrecios(productos, precio){
+                if(precio==1){
+                    productos = $.grep(productos, function(p) {
+                        if(p){
+                            var precioFormat = transformarPrecios(p.price);
+                            return precioFormat > 30000;
+                        }
+                    });
+                }else if(precio==2){
+                    productos = $.grep(productos, function(p) {
+                        if(p){
+                            var precioFormat = transformarPrecios(p.price);
+                            return precioFormat < 10000;
+                        }
+                    });
+                }
+                
+                return productos;
+            }
+            
+            // -------------------------------------------------------
+            function filtrarEstados(productos, estado){
+                if(estado==1){
+                    productos = $.grep(productos, function(p) {
+                        if(p){
+                            return p.available;
+                        }
+                    });
+                }else if(estado==2){
+                    productos = $.grep(productos, function(p) {
+                        if(p){
+                            return !p.available;
+                        }
+                    });
+                }
+                
+                return productos;
+            }
+            
+            // -------------------------------------------------------
+            function filtrarProductos(){
+                var categoria = $('#filtro-categoria-select').val();
+                var estado = $('input[name=estado]:checked').val();
+                var precio = $('input[name=precio]:checked').val();
+                
+                productosBusqueda = getProductos();
+                
+                productosBusqueda=filtrarCategorias(productosBusqueda,parseInt(categoria));
+                productosBusqueda=filtrarPrecios(productosBusqueda,precio);
+                productosBusqueda=filtrarEstados(productosBusqueda,estado);
+  
+                pintarProductos();
+            }
+            
+            // -------------------------------------------------------
+            function agregarAlCarrito(productoId,cantidad){
+                var carritoActual = getCarritoActual();
+                var current = encontrarProductoCarrito(productoId);//Obtengo el indice y el objeto producto
+
+                if(current && current.length > 0){
+                     var item = {
+                        id: productoId,
+                        cantidad: current[1].cantidad + cantidad
+                    };
+                    
+                    carritoActual[current[0]] = item;
+                    
+                }else{
+                    var item = {
+                        id: productoId,
+                        cantidad: cantidad
+                    };
+                    
+                    carritoActual.push(item);
+                }
+                
+                guardarCarrito(carritoActual);
+                pintarItemsCarrito();
+                
+                /*var cantidadActual = carritoActual[productoId];
+
+                if (cantidadActual){
+                    carritoActual[productoId] = cantidadActual + cantidad;
+                }else{
+                    carritoActual[productoId] = cantidad;
+                }*/   
+            }
+            
+            // -------------------------------------------------------
+            function cargarProductos(productos) {
+                var productosPersistentes = new Array();
+                $.each(productos, function( i, producto ) {
+                    if (producto){
+                        productosPersistentes.push(producto);
+                    }
+                });
+                
+                productosBusqueda = productosPersistentes;
+                
+                var jsonProductos = JSON.stringify( productosPersistentes );
+                localStorage.setItem("productos", jsonProductos);
+            }
+ 
+            // -------------------------------------------------------
+            function cargarCategorias(categorias){
+                $.each(categorias, function( i, categoria ){
+                    if(categoria){
+                         categoriasProductos[categoria.categori_id] = categoria;
+                    
+                        $('#filtro-categoria-select').append($('<option>', { 
+                            value: categoria.categori_id,
+                            text : categoria.name 
+                        }));
+                    }
+                });  
+            }
+            
+            // -------------------------------------------------------
+            function pintarProductos(){
+                ordenarProductos();
+                var productos = productosBusqueda;
+                $("#productos-content").empty();
+                var templateProducto = Handlebars.compile($('#tpl-producto').html());
+			
+                $.each(productos, function( i, producto ) {
+                    if (producto){
+                        var bestSeller = "No";
+                        var disponible = "No Disponible";
+                        var disponibleClassText = "text-danger";
+                        var disponibleClassBtn = "hidden";
+ 
+                        if(producto.available){
+                            disponible = "Disponible";
+                            var disponibleClassText = "text-success";
+                            disponibleClassBtn = "";
+                        }
+
+                        if(producto.best_seller){
+                            bestSeller = "Si";
+                        }
+
+                        var categoriasNombres = [];
+
+                        $.each(producto.categories, function( i, categoria ){
+                            var categoriaActual = categoriasProductos[categoria];
+                            categoriasNombres.push(categoriaActual.name);
+                        });
+
+                        var htmlLayout = templateProducto({
+                            id: producto.id, 
+                            nombre: producto.name,
+                            precio: producto.price,
+                            disponible: disponible,
+                            disponibleClassText: disponibleClassText,
+                            disponibleClassBtn: disponibleClassBtn,
+                            bestSeller: bestSeller,
+                            img: producto.img,
+                            categorias: categoriasNombres.join(),
+                            descripcion: producto.description
+                        });
+
+                        $("#productos-content").append(htmlLayout);
+                    }
+                });
+            }
+            
+            // -------------------------------------------------------
+            function ordenarProductos(){
+                var tipoFiltro = $('#ordenamiento').val();
+                 
+                if(tipoFiltro == 1){
+                    ordenarPorNombre();
+                }else if(tipoFiltro == 2){
+                    ordenarPorMenorPrecio();
+                }else if(tipoFiltro == 3){
+                    ordenarPorMayorPrecio();
+                }
+            }
+            
+            // -------------------------------------------------------
+            function cargarData() {
+                $.getJSON( "data.json", function( json ) {
+                    var productos = json.products;
+                    var categorias = json.categories;
+                    
+                    cargarCategorias(categorias);
+                    cargarProductos(productos);
+                    ordenarProductos();
+                    pintarProductos();
+                });
+            }
+            
+            // -------------------------------------------------------
+            $(document).ready(function () {
+                /*localStorage.removeItem("carrito");
+                localStorage.removeItem("productos");*/
+                
+                cargarData();   
+                pintarItemsCarrito();
+                
+                $( "#filtros" ).submit(function( e ) {
+                    e.preventDefault();
+                    filtrarProductos();
+                });
+                
+                /*$("#filtrar-btn").click(function () {
+                    filtrarProductos();
+                });*/
+                
+                $('#buscador-clue').keypress(function (e) {
+                    if (e.which == '13') {
+                        buscador($("#buscador-clue").val());
+                    }
+                });
+                
+                $("#ordenamiento").change(function () {
+                    pintarProductos();
+                });
+
+                $(document).on( "click", ".agregar-carrito", function(e) {
+                    e.preventDefault();
+                    var idProducto = $(this).attr("data-producto");
+                    agregarAlCarrito(idProducto,1);
+		});
+            });
+        </script>
+    </body>
+</html>

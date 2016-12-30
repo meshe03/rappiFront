@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="css/vendor/bootstrap.min.css">
+        <link rel="stylesheet" href="css/vendor/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script>
+            window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')
+        </script>
+    </head>
+    <body>
+        <div class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+              <div class="navbar-header">
+                <a href="/rappiFront" class="navbar-brand">Rappi Web UI</a>
+              </div>
+              <div class="navbar-collapse collapse" id="navbar-main">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">Mercedes Rodríguez</a></li>
+                    <li>
+                       <a href id="carrito-compra">
+                           <i class="fa fa-shopping-cart"></i>
+                           <span id="numero-items" class="badge"></span>
+                        </a> 
+                    </li>
+                </ul>
+              </div>
+            </div>
+        </div>
+        
+        <div class="container main-container">
+            <div class="row">
+                <div id="productos-carrito-content" class="col-xs-12 col-md-7">
+                
+                </div>
+            
+                <div id="total-content" class="col-xs-12 col-md-5">
+                    <div class="well bs-component">
+                        <h2>Total: <span id="total-carrito"></span></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        <!-- Scripts -->
+        
+        <!-- Templates -->
+        <script src="js/vendor/handlebars.js"></script>
+        <script src="js/main.js"></script>
+        
+        <script id="tpl-producto-carrito" type="text/x-handlebars-template">
+            <div id="producto-{{id}}" class="producto">
+                <div class="row">
+                    <div class="col-xs-5">
+                        <img src="{{img}}">
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="row"> 
+                            <div class="col-xs-12">
+                                <h4>{{nombre}}</h4>
+                                <strong>Precio: </strong>{{precio}}<br>
+                            </div>
+                        </div>
+                        
+                        <div class="row margin-top-simple"> 
+                            <div class="col-xs-4">
+                                <input type="text" class="cantidad-producto form-control input-sm" value="{{cantidad}}" data-producto-carrito="{{id}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-xs-12 margin-top-simple">
+                        <a href="#" class="btn btn-danger btn-xs eliminar-carrito" data-producto-carrito="{{id}}">Eliminar del Carrito</a>
+                    </div>
+                </div>
+            </div>
+        </script>
+        
+        <!-- Fin Template -->
+        
+        <script type="text/javascript">
+                                        
+            
+                                            
+            // -------------------------------------------------------
+            function modificarCantidad(productoId,cantidad){
+                var carritoActual = getCarritoActual();
+                var productoActual = carritoActual[productoId];
+
+                if (productoActual){
+                    carritoActual[productoId] = cantidad;
+                }
+
+                guardarCarrito(carritoActual);
+                pintarItemsCarrito();
+                pintarTotal();
+            }
+            
+            // -------------------------------------------------------
+            function eliminarDelCarrito(id){
+                var carritoActual = getCarritoActual();
+                
+                if (carritoActual[id]){
+                    carritoActual[id] = null;
+                    
+                    $("#producto-"+id ).remove();
+                    
+                    guardarCarrito(carritoActual);
+                    pintarItemsCarrito();
+                    pintarTotal();
+                }
+            }
+            
+            // -------------------------------------------------------
+            function calcularTotal(){
+                var carritoActual = getCarritoActual();
+                var total = 0;
+
+                $.each(carritoActual, function( productoId, productoCantidad ){
+                    if(productoCantidad){
+                        
+                        var current = encontrarProductoPersistente(productoId);
+                        if(current){
+                            var producto = current[0];
+                            var precio =  transformarPrecios(producto.price);            
+                            total = parseFloat(total + (productoCantidad * precio));
+                        }
+                    }
+                });
+
+                return total;
+            }
+            
+            // -------------------------------------------------------
+            function pintarTotal(){
+                var total = calcularTotal();
+                $('#total-carrito').text(total);
+            }
+                            
+            // -------------------------------------------------------
+            function pintarProductosCarrito(){
+                var productos = getCarritoActual();
+                var templateProducto = Handlebars.compile($('#tpl-producto-carrito').html());
+			
+                $.each(productos, function( i, item ) {
+                    if(item){
+                        var current = encontrarProductoPersistente(item.id);
+                        if(current){
+                            var producto = current[0];
+
+                            var htmlLayout = templateProducto({
+                                id: producto.id, 
+                                nombre: producto.name,
+                                precio: producto.price,
+                                img: producto.img,
+                                cantidad: item.cantidad
+                            });
+
+                            $("#productos-carrito-content").append(htmlLayout);   
+                        }
+                    }
+                });
+            }
+            
+            // -------------------------------------------------------
+            $(document).ready(function () {
+                pintarProductosCarrito();
+                pintarItemsCarrito();
+                pintarTotal();
+                
+                $(document).on( "click", ".eliminar-carrito", function(e) {
+                    e.preventDefault();
+                    var idProducto = $(this).attr("data-producto-carrito");
+                    eliminarDelCarrito(idProducto);
+		});
+                
+                $(document).on( "change", ".cantidad-producto", function(e) {
+                    e.preventDefault();
+                    var idProducto = $(this).attr("data-producto-carrito");
+                    var cantidad = $(this).val();
+                    modificarCantidad(idProducto,cantidad);
+		});
+            });
+        </script>
+    </body>
+</html>
