@@ -13,7 +13,7 @@
 }
 
 #productos-content .producto{
-    height: 250px;
+    height: 200px;
 }
 
 .producto img{
@@ -52,7 +52,7 @@
 
 @media (min-width: 572px) and (max-width: 767px){
     #productos-content .producto{
-        height: 300px;
+        height: 250px;
     }
 }
 
@@ -64,4 +64,9 @@
 
 #filtros-content hr{
     border-top: 1px solid #2c3e50;
+}
+
+#producto-modal .btn-link{
+    color: #2c3e50;
+    
 }

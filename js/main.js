@@ -79,7 +79,7 @@ function encontrarProductoPersistente(productoId){
 // -------------------------------------------------------
 function encontrarProductoCarrito(productoId){
     var productos = getCarritoActual();
-    var index = null;
+    var index = [];
     
     index = $.map(productos, function(obj, index) {
         if(obj.id == productoId) {

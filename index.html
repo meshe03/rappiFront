@@ -11,8 +11,11 @@
         <script>
             window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')
         </script>
+        <script type="text/javascript" src="js/vendor/bootstrap.min.js"></script>
     </head>
     <body>
+        
+        
         <div class="navbar navbar-default navbar-fixed-top">
             <div class="container">
               <div class="navbar-header">
@@ -104,16 +107,16 @@
                 
             </form>
 
-            <div class="col-xs-12 col-sm-9 margin-top-simple">
+            <div class="col-xs-12 col-sm-9">
                 <div class="row">
-                    <div class="col-xs-12 col-md-4">
+                    <div class="col-xs-12 col-md-4 margin-top-simple">
                         <select id="ordenamiento" class="form-control">
                             <option value="1">Nombre</option>
                             <option value="2">Menor Precio</option>
                             <option value="3">Mayor Precio</option>
                         </select>
                     </div>
-                    <div class="col-xs-12 col-md-4 pull-right">
+                    <div class="col-xs-12 col-md-4 pull-right margin-top-simple">
                         <input id="buscador-clue" type="text" class="form-control" placeholder="Buscador">
                     </div>
                 </div>
@@ -121,6 +124,33 @@
 
                 </div>
             </div>
+            
+            <div id="producto-modal" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        </div>
+                    <div id="producto-modal-body" class="modal-body">
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col-xs-2">
+                                <input id="cantidad-producto" type="number" class="cantidad-producto form-control input-sm" value="1">
+                            </div>
+                            <div class="col-xs-2">
+                                <button id="agregar-carrito" type="button" class="btn btn-success btn-sm" data-producto="">Agregar al carrito</button>
+                            </div>
+                            <div class="col-xs-3 pull-right">
+                                <a href="carrito.html" class="btn btn-link">Ir al Carrito</a>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        
         </div>
 
         <!-- Scripts -->
@@ -128,6 +158,37 @@
         <!-- Templates -->
         <script src="js/vendor/handlebars.js"></script>
         <script src="js/main.js"></script>
+        
+        <script id="tpl-producto-modal" type="text/x-handlebars-template">
+            <div class="row">
+                <div class="col-xs-11 col-xs-offset-1">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h4>{{nombre}}</h4>
+                        </div>
+                    </div>
+                
+                    <div class="row margin-top-mitad">
+                        <div class="col-xs-5">
+                            <img src="{{img}}">
+                        </div>
+                        <div class="col-xs-7">
+                            <span class="text-success">{{disponible}}</span><br>
+                            <strong>Precio: </strong>{{precio}}<br>
+                            <strong>Best Seller: </strong>{{bestSeller}}<br>
+                            <strong>Categorias: </strong>{{categorias}} 
+                        </div>
+                    </div>	
+               
+                    <div class="row margin-top-simple">
+                        <div class="col-xs-12">
+                            <p>{{descripcion}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </script>
         
         <script id="tpl-producto" type="text/x-handlebars-template">
             <div class="producto col-xs-12 col-md-6">
@@ -145,24 +206,12 @@
                          <span class="{{disponibleClassText}}">{{disponible}}</span><br>
                          <strong>Precio: </strong>{{precio}}<br>
                          <strong>Best Seller: </strong>{{bestSeller}}<br>
-                         <div class="row margin-top-simple {{disponibleClassBtn}}">
-                            <div class="col-xs-6">
-                                <a href="#" class="btn btn-success btn-xs agregar-carrito" data-producto="{{id}}">Agregar al Carrito</a>
-                            </div>
-                        </div>
-                    </div>
-                    
-                </div>
-                
-                 <div class="row margin-top-mitad">
-                    <div class="col-xs-6">
                          <strong>Categorias: </strong>{{categorias}}
                     </div>
-                </div>	
-               
-                <div class="row margin-top-mitad truncate">
-                    <div class="col-xs-12">
-                        <p>{{descripcion}}</p>
+                </div>
+                <div class="row margin-top-simple {{disponibleClassBtn}}">
+                    <div class="col-xs-6">
+                        <a href="#" class="btn btn-success btn-xs show-modal-producto" data-producto="{{id}}">Agregar al Carrito</a>
                     </div>
                 </div>
             </div>
@@ -314,7 +363,7 @@
                 if(current && current.length > 0){
                      var item = {
                         id: productoId,
-                        cantidad: current[1].cantidad + cantidad
+                        cantidad: parseInt(current[1].cantidad) + parseInt(cantidad)
                     };
                     
                     carritoActual[current[0]] = item;
@@ -322,7 +371,7 @@
                 }else{
                     var item = {
                         id: productoId,
-                        cantidad: cantidad
+                        cantidad: parseInt(cantidad)
                     };
                     
                     carritoActual.push(item);
@@ -369,6 +418,47 @@
                 });  
             }
             
+            // -------------------------------------------------------
+            function pintarProductoModal(productoId){
+                var item = encontrarProductoPersistente(productoId);
+
+                if (item){
+                    var producto = item[0];
+                    
+                    $("#producto-modal-body").empty();
+                    var templateProductoModal = Handlebars.compile($('#tpl-producto-modal').html());
+                
+                    var bestSeller = "No";
+
+                    if(producto.best_seller){
+                        bestSeller = "Si";
+                    }
+
+                    var categoriasNombres = [];
+
+                    $.each(producto.categories, function( i, categoria ){
+                        var categoriaActual = categoriasProductos[categoria];
+                        categoriasNombres.push(categoriaActual.name);
+                    });
+  
+                    var htmlLayout = templateProductoModal({
+                        id: producto.id, 
+                        nombre: producto.name,
+                        precio: producto.price,
+                        disponible: "Disponible",
+                        bestSeller: bestSeller,
+                        img: producto.img,
+                        categorias: categoriasNombres.join(),
+                        descripcion: producto.description
+                    });
+
+                    $("#producto-modal-body").append(htmlLayout);
+                    $("#agregar-carrito").attr("data-producto",producto.id);
+                    $("#producto-modal").modal('show');
+                }
+
+            }
+
             // -------------------------------------------------------
             function pintarProductos(){
                 ordenarProductos();
@@ -457,10 +547,6 @@
                     filtrarProductos();
                 });
                 
-                /*$("#filtrar-btn").click(function () {
-                    filtrarProductos();
-                });*/
-                
                 $('#buscador-clue').keypress(function (e) {
                     if (e.which == '13') {
                         buscador($("#buscador-clue").val());
@@ -471,10 +557,17 @@
                     pintarProductos();
                 });
 
-                $(document).on( "click", ".agregar-carrito", function(e) {
+                $(document).on( "click", ".show-modal-producto", function(e) {
                     e.preventDefault();
                     var idProducto = $(this).attr("data-producto");
-                    agregarAlCarrito(idProducto,1);
+                    pintarProductoModal(idProducto);
+		});
+                
+                $("#agregar-carrito").click(function (e) {
+                    e.preventDefault();
+                    var idProducto = $(this).attr("data-producto");
+                    var cantidad = $("#cantidad-producto").val();
+                    agregarAlCarrito(idProducto,cantidad);
 		});
             });
         </script>

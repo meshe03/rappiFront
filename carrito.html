@@ -69,7 +69,7 @@
                         
                         <div class="row margin-top-simple"> 
                             <div class="col-xs-4">
-                                <input type="text" class="cantidad-producto form-control input-sm" value="{{cantidad}}" data-producto-carrito="{{id}}">
+                                <input type="number" class="cantidad-producto form-control input-sm" value="{{cantidad}}" data-producto-carrito="{{id}}">
                             </div>
                         </div>
                     </div>
@@ -123,10 +123,10 @@
             // -------------------------------------------------------
             function eliminarDelCarrito(id){
                 var carritoActual = getCarritoActual();
+                var item = encontrarProductoCarrito(id);
                 
-                if (carritoActual[id]){
-                    carritoActual[id] = null;
-                    
+                if(item && item.length > 0){
+                    carritoActual.splice(item[0], 1);
                     $("#producto-"+id ).remove();
                     
                     guardarCarrito(carritoActual);
