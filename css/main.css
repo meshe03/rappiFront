@@ -66,9 +66,12 @@
 }
 
 @media (max-width: 767px) {
-    #product-info-content-modal{
+    .product-info-content{
         margin-top: 5px;
     }
+    
+    #productos-content .producto{
+        height: auto;
+    }
 }
-
 
