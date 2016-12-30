@@ -64,3 +64,11 @@
     color: #2c3e50;
     
 }
+
+@media (max-width: 767px) {
+    #product-info-content-modal{
+        margin-top: 5px;
+    }
+}
+
+
