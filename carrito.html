@@ -86,11 +86,28 @@
         <!-- Fin Template -->
         
         <script type="text/javascript">
-                                        
             
-                                            
             // -------------------------------------------------------
             function modificarCantidad(productoId,cantidad){
+                var carritoActual = getCarritoActual();
+                var current = encontrarProductoCarrito(productoId);//Obtengo el indice y el objeto producto
+
+                if(current && current.length > 0){
+                     var item = {
+                        id: productoId,
+                        cantidad:  cantidad
+                    };
+                    
+                    carritoActual[current[0]] = item;
+                }
+                
+                guardarCarrito(carritoActual);
+                pintarItemsCarrito();
+                pintarTotal(); 
+            }
+                                            
+            // -------------------------------------------------------
+            /*function modificarCantidad2(productoId,cantidad){
                 var carritoActual = getCarritoActual();
                 var productoActual = carritoActual[productoId];
 
@@ -101,7 +118,7 @@
                 guardarCarrito(carritoActual);
                 pintarItemsCarrito();
                 pintarTotal();
-            }
+            }*/
             
             // -------------------------------------------------------
             function eliminarDelCarrito(id){
@@ -123,14 +140,13 @@
                 var carritoActual = getCarritoActual();
                 var total = 0;
 
-                $.each(carritoActual, function( productoId, productoCantidad ){
-                    if(productoCantidad){
-                        
-                        var current = encontrarProductoPersistente(productoId);
+                $.each(carritoActual, function( i, item ){
+                    if(item){
+                        var current = encontrarProductoPersistente(item.id);
                         if(current){
                             var producto = current[0];
                             var precio =  transformarPrecios(producto.price);            
-                            total = parseFloat(total + (productoCantidad * precio));
+                            total = parseFloat(total + (item.cantidad * precio));
                         }
                     }
                 });
