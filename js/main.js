@@ -1,3 +1,13 @@
+function isOnlyNumbers(input){
+    var pattern = /^\d+$/;
+    return pattern.test(input);
+}
+
+function isEmpty(input){
+    return (input == "" || input == 0);
+}
+ 
+ 
  // -------------------------------------------------------
 function getCarritoActual(){
     var carritoActual = new Array();
@@ -16,16 +26,6 @@ function getProductos(){
         productos = JSON.parse(localStorage.getItem("productos"));
     }
     return productos;
-}
-
- // -------------------------------------------------------
-function getCategorias(){
-    var categorias = [];
-
-    if (localStorage.getItem("categorias")){
-        categorias = JSON.parse(localStorage.getItem("categorias"));
-    }
-    return categorias;
 }
 
 // -------------------------------------------------------

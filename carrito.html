@@ -42,6 +42,7 @@
                     <div class="well bs-component">
                         <h2>Total: <span id="total-carrito"></span></h2>
                     </div>
+                    <button id="limpiar-carrito" type="button" class="btn btn-primary btn-sm" data-producto="">Limpiar Carrito</button>
                 </div>
             </div>
         </div>
@@ -199,10 +200,19 @@
                 
                 $(document).on( "change", ".cantidad-producto", function(e) {
                     e.preventDefault();
-                    var idProducto = $(this).attr("data-producto-carrito");
+                    
                     var cantidad = $(this).val();
-                    modificarCantidad(idProducto,cantidad);
+                    if(isOnlyNumbers(cantidad) && !isEmpty(cantidad)){
+                        var idProducto = $(this).attr("data-producto-carrito");
+                        modificarCantidad(idProducto,cantidad);
+                    }
 		});
+                
+                $("#limpiar-carrito").click(function (e) {
+                    guardarCarrito([]);
+                    location.reload();
+                });
+
             });
         </script>
     </body>

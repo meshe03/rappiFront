@@ -137,7 +137,7 @@
                     <div class="modal-footer">
                         <div class="row">
                             <div class="col-xs-2">
-                                <input id="cantidad-producto" type="number" class="cantidad-producto form-control input-sm" value="1">
+                                <input id="cantidad-producto" type="text" class="cantidad-producto form-control input-sm" value="1">
                             </div>
                             <div class="col-xs-2">
                                 <button id="agregar-carrito" type="button" class="btn btn-success btn-sm" data-producto="">Agregar al carrito</button>
@@ -203,17 +203,29 @@
                         <img src="{{img}}">
                     </div>
                     <div class="col-xs-6">
-                         <span class="{{disponibleClassText}}">{{disponible}}</span><br>
-                         <strong>Precio: </strong>{{precio}}<br>
-                         <strong>Best Seller: </strong>{{bestSeller}}<br>
+                        <span class="{{disponibleClassText}}">{{disponible}}</span><br>
+                        <strong>Precio: </strong>{{precio}}<br>
+                        <strong>Best Seller: </strong>{{bestSeller}}<br>
+                        <div class="row margin-top-simple {{disponibleClassBtn}}">
+                            <div class="col-xs-6">
+                                <a href="#" class="btn btn-success btn-xs show-modal-producto" data-producto="{{id}}">Agregar al Carrito</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                 <div class="row margin-top-mitad">
+                    <div class="col-xs-6">
                          <strong>Categorias: </strong>{{categorias}}
                     </div>
-                </div>
-                <div class="row margin-top-simple {{disponibleClassBtn}}">
-                    <div class="col-xs-6">
-                        <a href="#" class="btn btn-success btn-xs show-modal-producto" data-producto="{{id}}">Agregar al Carrito</a>
+                </div>	
+               
+                <div class="row margin-top-mitad truncate hidden-xs">
+                    <div class="col-xs-12">
+                        <p>{{descripcion}}</p>
                     </div>
                 </div>
+                
             </div>
         </script>
         <!-- Fin Templates -->
@@ -565,9 +577,12 @@
                 
                 $("#agregar-carrito").click(function (e) {
                     e.preventDefault();
-                    var idProducto = $(this).attr("data-producto");
                     var cantidad = $("#cantidad-producto").val();
-                    agregarAlCarrito(idProducto,cantidad);
+                    
+                    if(isOnlyNumbers(cantidad) && !isEmpty(cantidad)){
+                        var idProducto = $(this).attr("data-producto");
+                        agregarAlCarrito(idProducto,cantidad);
+                    }        
 		});
             });
         </script>

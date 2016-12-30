@@ -13,7 +13,7 @@
 }
 
 #productos-content .producto{
-    height: 200px;
+    height: 250px;
 }
 
 .producto img{
@@ -48,12 +48,6 @@
 
 #carrito-compra .badge{
     font-size: 11px;
-}
-
-@media (min-width: 572px) and (max-width: 767px){
-    #productos-content .producto{
-        height: 250px;
-    }
 }
 
 .truncate{
