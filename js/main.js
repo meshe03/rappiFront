@@ -1,8 +1,17 @@
+var urlJson = "json/data.json"; //URL de donde se obtendrá el json
+
+ // -------------------------------------------------------
+function getJsonUrl(){
+    return urlJson;
+}
+
+ // -------------------------------------------------------
 function isOnlyNumbers(input){
     var pattern = /^\d+$/;
     return pattern.test(input);
 }
 
+// -------------------------------------------------------
 function isEmpty(input){
     return (input == "" || input == 0);
 }
