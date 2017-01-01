@@ -241,12 +241,10 @@ function pintarProductos(){
             var bestSeller = "No";
             var disponible = "No Disponible";
             var disponibleClassText = "text-danger";
-            var disponibleClassBtn = "hidden";
 
             if(producto.available){
                 disponible = "Disponible";
                 var disponibleClassText = "text-success";
-                disponibleClassBtn = "";
             }
 
             if(producto.best_seller){
@@ -266,7 +264,6 @@ function pintarProductos(){
                 precio: producto.price,
                 disponible: disponible,
                 disponibleClassText: disponibleClassText,
-                disponibleClassBtn: disponibleClassBtn,
                 bestSeller: bestSeller,
                 img: producto.img,
                 categorias: categoriasNombres.join(),

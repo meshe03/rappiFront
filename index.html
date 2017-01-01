@@ -2,7 +2,7 @@
 
 <html>
     <head>
-        <title></title>
+        <title>Rappi Web UI</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="css/vendor/bootstrap.min.css">
@@ -43,7 +43,7 @@
                     <div class="col-xs-12">
                         <strong>Categorías</strong>
                         <select id="filtro-categoria-select" class="form-control margin-top-simple">
-                            <option value="0">Seleccione</option>
+                            <option value="0">Todas</option>
                         </select>
                         <hr />
                     </div>
@@ -206,7 +206,7 @@
                         <span class="{{disponibleClassText}}">{{disponible}}</span><br>
                         <strong>Precio: </strong>{{precio}}<br>
                         <strong>Best Seller: </strong>{{bestSeller}}<br>
-                        <div class="row margin-top-simple {{disponibleClassBtn}}">
+                        <div class="row margin-top-simple">
                             <div class="col-xs-6">
                                 <a href="#" class="btn btn-success btn-xs show-modal-producto" data-producto="{{id}}">Agregar al Carrito</a>
                             </div>
